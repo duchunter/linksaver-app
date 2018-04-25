@@ -1,0 +1,47 @@
+{
+  "cordova-plugin-whitelist": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-whitelist@1"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-device": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-device"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-spinnerdialog": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-spinnerdialog"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-dialogs": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-dialogs"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-customurlscheme": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-customurlscheme"
+    },
+    "is_top_level": true,
+    "variables": {
+      "URL_SCHEME": "com.gp.linksaver",
+      "ANDROID_SCHEME": "com.gp.linksaver",
+      "ANDROID_HOST": "gangplank.auth0.com",
+      "ANDROID_PATHPREFIX": "/cordova/com.gp.linksaver/callback"
+    }
+  }
+}

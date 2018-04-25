@@ -1,0 +1,11 @@
+{
+  "background_color": "#FFF",
+  "display": "standalone",
+  "name": "Linksaver",
+  "short_name": "Linksaver",
+  "version": "com.gp.linksaver",
+  "description": "Hybrid Vue + Cordova",
+  "author": "Gangplank",
+  "icons": [],
+  "start_url": "dist/index.html"
+}

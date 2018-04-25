@@ -1,0 +1,28 @@
+{
+  "prepare_queue": {
+    "installed": [],
+    "uninstalled": []
+  },
+  "config_munge": {
+    "files": {}
+  },
+  "installed_plugins": {
+    "cordova-plugin-whitelist": {
+      "PACKAGE_NAME": "com.gp.linksaver"
+    },
+    "cordova-plugin-device": {
+      "PACKAGE_NAME": "com.gp.linksaver"
+    },
+    "cordova-plugin-spinnerdialog": {
+      "PACKAGE_NAME": "com.gp.linksaver"
+    },
+    "cordova-plugin-dialogs": {
+      "PACKAGE_NAME": "com.gp.linksaver"
+    },
+    "cordova-plugin-customurlscheme": {
+      "URL_SCHEME": "com.gp.linksaver",
+      "PACKAGE_NAME": "com.gp.linksaver"
+    }
+  },
+  "dependent_plugins": {}
+}
