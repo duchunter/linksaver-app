@@ -17,7 +17,10 @@ export default {
     setMode(mode) {
       this.$parent.mode = mode;
       this.hideNav();
-      this.hideSearch();
+    },
+
+    hideNav() {
+      $('#navbar').collapse('hide');
     },
   }
 }

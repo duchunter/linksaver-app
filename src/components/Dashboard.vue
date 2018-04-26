@@ -36,12 +36,12 @@
 </template>
 
 <script>
-import AppNav from './AppNav';
-import LinksTable from './LinksTable';
-import InfoPage from './InfoPage';
-import StatusBar from './StatusBar';
-import LinkInfo from './LinkInfo';
-import BottomNav from './BottomNav';
+import AppNav from './Navigation/AppNav';
+import LinksTable from './Linktable/LinksTable';
+import InfoPage from './Info/InfoPage';
+import StatusBar from './Navigation/StatusBar';
+import LinkInfo from './Modals/LinkInfo';
+import BottomNav from './Navigation/BottomNav';
 
 export default {
   name: 'Dashboard',
@@ -67,7 +67,7 @@ export default {
       linkData: {
         link: '',
         title: '',
-        tags: [],
+        tags: '',
         added: 0,
         doc: '',
         rating: '',
@@ -81,7 +81,16 @@ export default {
       },
 
       tempLinks: [],
-      mainLinks: [],
+      mainLinks: [{
+        link: 'test',
+        title: 'test',
+        tags: 'test',
+      },
+      {
+        link: 'atest',
+        title: 'atest',
+        tags: 'atest',
+      }],
       linkChanges: { id: 0 },
       deleteId: 0,
     }

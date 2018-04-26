@@ -41,16 +41,10 @@
 </template>
 
 <script>
-import SearchBar from './SearchBar';
-import { isLoggedIn, login } from '../../utils/auth';
+import { isLoggedIn, login } from '../../../utils/auth';
 
 export default {
   name: 'app-nav',
-  props: [],
-  components: {
-    SearchBar,
-  },
-
   mounted() {
     $('.navbar-collapse a:not(.dropdown-toggle)').click(function(){
         $(this).parents('.navbar-collapse').collapse('hide');

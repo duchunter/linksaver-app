@@ -67,7 +67,7 @@
 </template>
 
 <script>
-import { getInfo, sendLog } from '../../utils/api';
+import { getInfo, sendLog } from '../../../utils/api';
 
 export default {
   name: 'InfoPage',
@@ -83,7 +83,7 @@ export default {
   },
 
   mounted() {
-    
+
   },
 
   methods: {

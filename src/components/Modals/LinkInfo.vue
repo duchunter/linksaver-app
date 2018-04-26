@@ -209,7 +209,7 @@
 </template>
 
 <script>
-import { addLink, editLink, adjustLink, deleteLink } from '../../utils/api';
+import { addLink, editLink, adjustLink, deleteLink } from '../../../utils/api';
 
 export default {
   name: 'LinkInfo',
