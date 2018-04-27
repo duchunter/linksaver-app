@@ -52,7 +52,7 @@
     </div>
 
     <sort-options :table="mainLinks"/>
-    <filter-bar/>
+    <filter-bar :condition="condition" :picker="picker"/>
   </div>
 </template>
 
@@ -62,13 +62,21 @@ import SortOptions from './SortOptions';
 
 export default {
   name: 'HeaderButton',
-  props: ['mode', 'main', 'temp', 'mainLinks', 'tempLinks', 'displayOption'],
+  props: [
+    'mode', 'main', 'temp', 'mainLinks', 'tempLinks',
+    'displayOption', 'condition', 'picker'
+  ],
+
   components: { FilterBar, SortOptions },
   methods: {
     // Clear filter
     clearFilter() {
-      Object.keys(this.$parent.condition).forEach(key => {
-        this.$parent.condition[key] = '';
+      Object.keys(this.condition).forEach(key => {
+        this.condition[key] = '';
+      });
+
+      Object.keys(this.picker).forEach(key => {
+        delete this.picker[key];
       });
     },
   }

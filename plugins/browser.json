@@ -22,6 +22,9 @@
     "cordova-plugin-customurlscheme": {
       "URL_SCHEME": "com.gp.linksaver",
       "PACKAGE_NAME": "com.gp.linksaver"
+    },
+    "cordova-plugin-file": {
+      "PACKAGE_NAME": "com.gp.linksaver"
     }
   },
   "dependent_plugins": {}

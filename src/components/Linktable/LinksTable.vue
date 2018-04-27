@@ -5,6 +5,8 @@
         <div class="row">
           <div class="col-lg-12">
             <header-buttons :mode="mode"
+                            :condition="condition"
+                            :picker="picker"
                             :main="main"
                             :temp="temp"
                             :mainLinks="mainLinks"
@@ -138,6 +140,10 @@ export default {
   computed: {
     main() {
       let newList = this.mainLinks.filter(this.filterList);
+      if (Object.values(this.condition).filter(x => x).length == 0) {
+        newList = [];
+      }
+
       if (this.mode == 'main') {
         let percent = newList.length / this.mainLinks.length * 100;
         $('#displaying-link').css('width', `${percent}%`);
@@ -168,23 +174,42 @@ export default {
 
     filterList(link) {
       let ok = true;
+      // Check string data
       Object.keys(this.condition).forEach(key => {
         if (this.condition[key]) {
           if (!link[key]) {
             ok = false;
+            return ok;
+          }
+
+          if (this.splitData.includes(key)) {
+            this.condition[key].split(', ').forEach(item => {
+              ok &= link[key].toLowerCase().includes(item.toLowerCase());
+            });
           } else {
-            if (this.splitData.includes(key)) {
-              this.condition[key].split(', ').forEach(item => {
-                ok &= link[key].toLowerCase().includes(item.toLowerCase());
-              })
-            } else {
-              ok &= link[key]
-                .toLowerCase()
-                .includes(this.condition[key].toLowerCase());
-            }
+            ok &= link[key]
+              .toLowerCase()
+              .includes(this.condition[key].toLowerCase());
           }
         }
       });
+
+      // Check picker data
+      if (this.picker.rating) {
+        ok &= link.rating >= this.picker.rating.value[0].value;
+        ok &= link.rating <= this.picker.rating.value[1].value;
+      }
+
+      if (this.picker.added) {
+        ok &= link.added >= this.picker.added.value[0].value;
+        ok &= link.added <= this.picker.added.value[1].value;
+      }
+
+      if (this.picker.lastedit) {
+        ok &= link.lastedit >= this.picker.lastedit.value[0].value;
+        ok &= link.lastedit <= this.picker.lastedit.value[1].value;
+      }
+
       return ok;
     },
   },

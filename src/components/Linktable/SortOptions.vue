@@ -31,10 +31,6 @@
 export default {
   name: 'SortOptions',
   props: ['table'],
-  mounted() {
-    this.sortDate('added');
-  },
-
   methods: {
     // Sort by title
     sortTitle() {

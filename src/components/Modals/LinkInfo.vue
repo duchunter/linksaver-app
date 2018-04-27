@@ -32,7 +32,7 @@
                     @click="copyToClipboard"
                     data-toggle="tooltip"
                     title="Copy to clipboard">
-              <i class="fa fa-clipboard"></i>
+              Copy
             </button>
 
             <!-- Open -->
@@ -41,7 +41,7 @@
                target="_blank"
                data-toggle="tooltip"
                title="Open in new tab">
-              <i class="fa fa-arrow-circle-right"></i>
+              Open
             </a>
           </div>
         </div>
@@ -209,7 +209,9 @@
 </template>
 
 <script>
-import { addLink, editLink, adjustLink, deleteLink } from '../../../utils/api';
+import {
+  addLink, editLink, adjustLink, deleteLink, updateLink
+} from '../../../utils/api';
 
 export default {
   name: 'LinkInfo',
@@ -335,7 +337,11 @@ export default {
     parseDate(time) {
       if (!time) return 'none';
       const date = new Date(parseInt(time));
-      return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+      return date.toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      });
     },
 
     // Clear data in add mode
@@ -357,53 +363,68 @@ export default {
     },
 
     // Add link
-    addNewLink() {
-      addLink(this.newLink, false).then((res) => {
-        this.triggerAlert(res.status, res.data);
-      }).catch((err) => {
-        this.triggerAlert(err.response.status, err.response.data);
-      });
+    async addNewLink() {
+      window.plugins.spinnerDialog.show('Add new link', 'Please wait', true);
+      try {
+        let response = await addLink(this.newLink, false);
+        this.triggerAlert(response.status, response.data);
+      } catch (err) {
+        if (!err.response) {
+          this.triggerAlert(500, err);
+        } else {
+          this.triggerAlert(err.response.status, err.response.data);
+        }
+      }
+
+      window.plugins.spinnerDialog.hide();
     },
 
     // Edit link info
-    editlinkInfo() {
+    async editlinkInfo() {
+      window.plugins.spinnerDialog.show('Edit link', 'Please wait', true);
       let mode = this.$parent.mode;
-      editLink({
-        id: this.linkData.id,
-        table: mode[0].toUpperCase() + mode.slice(1),
-        changes: this.linkChanges,
-        link: this.linkData.link
-      })
-      .then(res => {
-        this.triggerAlert(res.status, res.data);
+      try {
+        let response = await editLink({
+          id: this.linkData.id,
+          table: mode[0].toUpperCase() + mode.slice(1),
+          changes: this.linkChanges,
+          link: this.linkData.link
+        });
+        this.triggerAlert(response.status, response.data);
 
         // Clear old changes
-        Object.keys(this.$parent.linkChanges).forEach(key => {
+        for (let key in this.$parent.linkChanges) {
           delete this.$parent.linkChanges[key];
-        });
+        }
 
         // Apply changes to current linkData and source data in table
-        Object.keys(this.linkChanges).forEach(key => {
+        for (let key in this.linkChanges) {
           this.linkData[key] = this.linkChanges[key];
           this.$parent.linkChanges[key] = this.linkChanges[key];
-        });
+        }
 
         this.$parent.linkChanges.id = this.linkData.id;
         this.discardChanges();
-      })
-      .catch(err => {
-        this.triggerAlert(err.response.status, err.response.data);
-      });
+      } catch (err) {
+        if (!err.response) {
+          this.triggerAlert(500, err);
+        } else {
+          this.triggerAlert(err.response.status, err.response.data);
+        }
+      }
+
+      window.plugins.spinnerDialog.hide();
     },
 
     // Promote or demote link
-    adjustLink() {
-      adjustLink({
-        promote: this.deleteMode == 'promote',
-        id: this.linkData.id,
-      })
-      .then(res => {
-        this.triggerAlert(res.status, res.data);
+    async adjustLink() {
+      window.plugins.spinnerDialog.show('Adjust link', 'Please wait', true);
+      try {
+        let response = await adjustLink({
+          promote: this.deleteMode == 'promote',
+          id: this.linkData.id,
+        });
+        this.triggerAlert(response.status, response.data);
 
         // Delete source data in table
         this.$parent.deleteId = 0;
@@ -411,22 +432,27 @@ export default {
 
         // Hide this modal
         $('#link-info-modal').modal('hide');
-      })
-      .catch(err => {
-        this.triggerAlert(err.response.status, err.response.data);
-      });
+      } catch (e) {
+        if (!err.response) {
+          this.triggerAlert(500, err);
+        } else {
+          this.triggerAlert(err.response.status, err.response.data);
+        }
+      }
+
+      window.plugins.spinnerDialog.hide();
     },
 
-    deleteLink() {
+    async deleteLink() {
+      window.plugins.spinnerDialog.show('Delete link', 'Please wait', true);
       let mode = this.$parent.mode;
-
-      deleteLink({
-        table: mode[0].toUpperCase() + mode.slice(1),
-        id: this.linkData.id,
-        link: this.linkData.link,
-      })
-      .then(res => {
-        this.triggerAlert(res.status, res.data);
+      try {
+        let response = deleteLink({
+          table: mode[0].toUpperCase() + mode.slice(1),
+          id: this.linkData.id,
+          link: this.linkData.link,
+        });
+        this.triggerAlert(response.status, response.data);
 
         // Delete source data in table
         this.$parent.deleteId = 0;
@@ -434,10 +460,15 @@ export default {
 
         // Hide this modal
         $('#link-info-modal').modal('hide');
-      })
-      .catch(err => {
-        this.triggerAlert(err.response.status, err.response.data);
-      });
+      } catch (e) {
+        if (!err.response) {
+          this.triggerAlert(500, err);
+        } else {
+          this.triggerAlert(err.response.status, err.response.data);
+        }
+      }
+
+      window.plugins.spinnerDialog.hide();
     },
   },
 }

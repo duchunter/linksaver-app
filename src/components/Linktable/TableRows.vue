@@ -1,7 +1,7 @@
 <template>
   <tbody>
     <tr v-for="link in links"
-        @click.native="displayInfo(link)"
+        @click="showInfo(link)"
         data-toggle="modal"
         data-target="#link-info-modal">
       <td v-for="item in Object.keys(displayOption)"
@@ -21,7 +21,7 @@ export default {
   name: 'TableRows',
   props: ['links', 'displayOption'],
   methods: {
-    displayInfo(link) {
+    showInfo(link) {
       this.$parent.displayInfo(link);
     },
 

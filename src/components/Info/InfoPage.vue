@@ -11,10 +11,34 @@
       <button class="btn btn-primary" @click=clearLog>
         Clear log
       </button>
+
+      <button class="btn btn-success" @click=importData>
+        Import data
+      </button>
     </div>
 
     <!-- Progress bar -->
-    <h4>Database</h4>
+    <h4>App database</h4>
+    <div class="progress">
+      <div id="appMain"
+           class="progress-bar progress-bar-success"
+           data-toggle="tooltip"
+           data-placement="top"
+           title="Main"
+           role="progressbar">
+        {{appMain}}
+      </div>
+      <div id="appTemp"
+           class="progress-bar progress-bar-warning"
+           data-toggle="tooltip"
+           data-placement="top"
+           title="Temp"
+           role="progressbar">
+        {{appTemp}}
+      </div>
+    </div>
+
+    <h4>Server database</h4>
     <div class="progress">
       <div id="mainCount"
            class="progress-bar progress-bar-success"
@@ -68,10 +92,11 @@
 
 <script>
 import { getInfo, sendLog } from '../../../utils/api';
+import { readFile } from '../../../utils/model';
 
 export default {
   name: 'InfoPage',
-  props: ['actionLogs'],
+  props: ['actionLogs', 'appMain', 'appTemp'],
   data() {
     return {
       basicInfo: {
@@ -83,64 +108,96 @@ export default {
   },
 
   mounted() {
-
+    this.$parent.adjustAppProgressBar();
   },
 
   methods: {
+    // Import data
+    importData() {
+      try {
+        readFile('main.json', this.$parent);
+        readFile('temp.json', this.$parent);
+      } catch (err) {
+        this.triggerAlert(500, err);
+        return;
+      }
+
+      this.triggerAlert(200, 'Data imported');
+    },
+
     // Trigger alert
     triggerAlert(code, msg) {
       this.$parent.showStatus(code, msg);
     },
 
     // Get basic info
-    getBasicInfo() {
-      let database = ['Main', 'Temp'];
+    async getServerInfo() {
+      // Get info concurrently
+      let getMainInfo = getInfo({ table: 'Main' });
+      let getTempInfo = getInfo({ table: 'Temp' });
+      let getLogInfo = getInfo({ table: 'Logs' });
 
-      // Count 2 link table
-      database.forEach(table => {
-        getInfo({ table }).then(res => {
-          // Set data
-          this.basicInfo[table] = parseInt(res);
+      let mainCount = await getMainInfo;
+      let tempCount = await getTempInfo;
+      let logCount = await getLogInfo;
 
-          // Adjust progress bar
-          let total = database.reduce((sum, cur) => {
-            return sum + this.basicInfo[cur];
-          }, 0);
+      this.basicInfo.Main = parseInt(mainCount);
+      this.basicInfo.Temp = parseInt(tempCount);
+      this.basicInfo.Logs = parseInt(logCount);
 
-          database.forEach(table => {
-            let width = this.basicInfo[table] * 100 / total;
-            $(`#${table.toLowerCase()}Count`).css('width', `${width}%`);
-          });
-
-        }).catch(err => {
-          this.triggerAlert(err.response.status, err.response.data);
-        });
-      });
-
-      // Count log
-      getInfo({ table: 'Logs' }).then(res => {
-        this.basicInfo.Logs = parseInt(res);
-        $('#logsCount').css('width', `${res > 100 ? '100' : res}%`);
-      });
+      // Adjust progress bar percentage
+      let total = this.basicInfo.Main + this.basicInfo.Temp;
+      $(`#mainCount`).css('width', `${this.basicInfo.Main * 100 / total}%`);
+      $(`#tempCount`).css('width', `${this.basicInfo.Temp * 100 / total}%`);
+      $('#logsCount').css(
+        'width',
+        `${this.basicInfo.Logs > 100 ? '100' : this.basicInfo.Logs}%`
+      );
     },
 
     // Get basic info again
     reload() {
-      Object.keys(this.basicInfo).forEach(table => {
+      // Clear current info to reduce progress bar to 0
+      for (let table in this.basicInfo) {
         this.basicInfo[table] = 0;
         $(`#${table.toLowerCase()}Count`).css('width', '0%');
-      });
+      }
 
-      setTimeout(this.getBasicInfo, 500);
+      // Active spinner
+      window.plugins.spinnerDialog.show('Asking server', 'Please wait', true);
+
+      // Wait for animation to complete
+      setTimeout(async () => {
+        try {
+          await this.getServerInfo();
+        } catch (err) {
+          if (!err.response) {
+            this.triggerAlert(500, err);
+          } else {
+            this.triggerAlert(err.response.status, err.response.data);
+          }
+        }
+
+        window.plugins.spinnerDialog.hide();
+      }, 200);
     },
 
     // Clear log
-    clearLog() {
-      sendLog().then(res => {
-        this.triggerAlert(res.status, res.data);
-      }).catch(err => {
-        this.triggerAlert(err.response.status, err.response.data);
-      });
+    async clearLog() {
+      window.plugins.spinnerDialog.show('Clear log', 'Please wait', true);
+      try {
+        let response = await sendLog();
+        this.triggerAlert(response.status, response.data);
+        $(`#logsCount`).css('width', '0%');
+      } catch (err) {
+        if (!err.response) {
+          this.triggerAlert(500, err);
+        } else {
+          this.triggerAlert(err.response.status, err.response.data);
+        }
+      }
+
+      window.plugins.spinnerDialog.hide();
     }
   }
 }
@@ -162,7 +219,7 @@ export default {
   background-color: #212121;
 }
 
-#mainCount, #tempCount, #logsCount {
+#mainCount, #tempCount, #logsCount, #appMain, #appTemp {
   width: 0%;
   transition: width 1s ease;
 }

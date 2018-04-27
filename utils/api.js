@@ -5,8 +5,23 @@ const BASE_URL = 'https://gp-linksaver.herokuapp.com';
 
 export {
   getInfo, searchLink, addLink, editLink,
-  adjustLink, deleteLink, sendLog,
+  adjustLink, deleteLink, updateLink, sendLog,
 };
+
+// Return the latest version of a link
+async function updateLink(link, table) {
+  try {
+    let result = await searchLink({
+      table,
+      mode: 'all',
+      condition: { link }
+    });
+
+    return result[0] || {};
+  } catch (err) {
+    return { err };
+  }
+}
 
 // No requirement
 async function sendLog() {

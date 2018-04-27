@@ -43,5 +43,13 @@
       "ANDROID_HOST": "gangplank.auth0.com",
       "ANDROID_PATHPREFIX": "/cordova/com.gp.linksaver/callback"
     }
+  },
+  "cordova-plugin-file": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-file@6.0.1"
+    },
+    "is_top_level": true,
+    "variables": {}
   }
 }

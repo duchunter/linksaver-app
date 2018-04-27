@@ -7,7 +7,10 @@
     <app-nav/>
 
     <transition name="mode" mode="out-in">
-      <info-page v-if="mode == 'info'" :actionLogs="actionLogs"/>
+      <info-page v-if="mode == 'info'"
+                 :appMain="appMain"
+                 :appTemp="appTemp"
+                 :actionLogs="actionLogs"/>
       <links-table v-if="mode != 'info'"
                    :mode="mode"
                    :tempLinks="tempLinks"
@@ -81,16 +84,9 @@ export default {
       },
 
       tempLinks: [],
-      mainLinks: [{
-        link: 'test',
-        title: 'test',
-        tags: 'test',
-      },
-      {
-        link: 'atest',
-        title: 'atest',
-        tags: 'atest',
-      }],
+      mainLinks: [],
+      appMain: 0,
+      appTemp: 0,
       linkChanges: { id: 0 },
       deleteId: 0,
     }
@@ -122,6 +118,16 @@ export default {
   },
 
   methods: {
+    // Adjust app progress bar
+    adjustAppProgressBar() {
+      this.appMain = this.mainLinks.length;
+      this.appTemp = this.tempLinks.length;
+      let percentMain = this.appMain / (this.appMain + this.appTemp) * 100;
+      let percentTemp = this.appTemp / (this.appMain + this.appTemp) * 100;
+      $(`#appMain`).css('width', `${percentMain}%`);
+      $(`#appTemp`).css('width', `${percentTemp}%`);
+    },
+
     // Toggle status bar
     hideStatus() {
       $('#status-bar').collapse('hide');

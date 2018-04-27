@@ -30,9 +30,9 @@
 
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
-            <li><a @click="">Check token</a></li>
+            <li><a @click="checkToken">Check token</a></li>
             <li><a @click="login">Login</a></li>
-            <li><a @click="">Update</a></li>
+            <li><a @click="update">Update</a></li>
           </ul>
         </div>
       </div>
@@ -42,6 +42,8 @@
 
 <script>
 import { isLoggedIn, login } from '../../../utils/auth';
+import { searchLink } from '../../../utils/api';
+import { writeFile } from '../../../utils/model';
 
 export default {
   name: 'app-nav',
@@ -53,6 +55,41 @@ export default {
 
   methods: {
     login,
+    checkToken() {
+      this.$parent.showStatus('Access token', isLoggedIn());
+    },
+
+    async update() {
+      if (!isLoggedIn()) {
+        this.$parent.showStatus(401, "Please log in first");
+        return;
+      }
+
+      window.plugins.spinnerDialog.show('Updating', 'Please wait', true);
+      try {
+        let getMain = searchLink({ mode: 'all', table: 'Main' });
+        let getTemp = searchLink({ mode: 'all', table: 'Temp' });
+
+        let mainResponse = await getMain;
+        let tempResponse = await getTemp;
+
+        this.$parent.mainLinks = mainResponse.data.reverse();
+        this.$parent.tempLinks = tempResponse.data.reverse();
+
+        writeFile('main.json', JSON.stringify(this.$parent.mainLinks));
+        writeFile('temp.json', JSON.stringify(this.$parent.tempLinks));
+      } catch (err) {
+        if (!err.response) {
+          this.$parent.showStatus(500, err);
+        } else {
+          this.$parent.showStatus(err.response.status, err.response.data);
+        }
+      }
+
+      this.$parent.adjustAppProgressBar();
+      window.plugins.spinnerDialog.hide();
+    },
+
     hideNav() {
       $('#navbar').collapse('hide');
     },

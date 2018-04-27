@@ -89,6 +89,7 @@ import RatingModal from '../Modals/RatingModal';
 
 export default {
   name: 'FilterBar',
+  props: ['condition', 'picker'],
   components: {
     DateModal,
     RatingModal,
@@ -96,7 +97,6 @@ export default {
 
   data() {
     return {
-      condition: this.$parent.$parent.condition,
       pickerTitle: 'Added'
     }
   },
@@ -106,6 +106,10 @@ export default {
     clearFilter() {
       Object.keys(this.condition).forEach(key => {
         this.condition[key] = '';
+      });
+
+      Object.keys(this.picker).forEach(key => {
+        delete this.picker[key];
       });
     },
 

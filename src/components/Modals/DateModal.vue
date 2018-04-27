@@ -145,7 +145,7 @@ export default {
 
       // Set data
       this.$parent.picker[this.target] = invalid
-        ? {}
+        ? null
         : {
           logic: '&&',
           value: mode == 'exact'
@@ -179,7 +179,5 @@ export default {
 </script>
 
 <style scoped>
-
-
 
 </style>

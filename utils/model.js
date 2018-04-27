@@ -3,10 +3,15 @@
 export { readFile, writeFile };
 
 function handleError(err) {
-  alert(JSON.stringify(err));
+  if (err.code == 1) {
+    alert('Cannot open file: ' + JSON.stringify(err));
+  } else {
+    alert(err);
+    alert(JSON.stringify(err));
+  }
 }
 
-function writeFile(filename, content, msg = "Write complete") {
+function writeFile(filename, content, msg = "Write file complete") {
   window.resolveLocalFileSystemURL(
     cordova.file.externalDataDirectory,
     dir => {
@@ -35,19 +40,31 @@ function writeFile(filename, content, msg = "Write complete") {
   );
 }
 
-function readFile(filename, outputArr) {
+function readFile(filename, outputObj) {
   window.resolveLocalFileSystemURL(
     cordova.file.externalDataDirectory,
-    dir => {
+    function (dir) {
       dir.getFile(
         filename,
         {},
-        fileEntry => {
-          fileEntry.file(file => {
+        function (fileEntry) {
+          fileEntry.file(function (file) {
             let reader = new FileReader();
             // Read complete callback
-            reader.onloadend = e => {
-              outputArr = JSON.parse(this.result);
+            reader.onloadend = function (e) {
+              try {
+                let pack = JSON.parse(this.result);
+                alert('Import: ' + pack.length);
+                if (filename == 'main.json') {
+                  outputObj.mainLinks = pack;
+                }
+
+                if (filename == 'temp.json') {
+                  outputObj.tempLinks = pack;
+                }
+              } catch (e) {
+                alert(e);
+              }
             }
 
             // Read file
