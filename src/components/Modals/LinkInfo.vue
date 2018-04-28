@@ -364,6 +364,11 @@ export default {
 
     // Add link
     async addNewLink() {
+      if (!this.newLink.link) {
+        this.triggerAlert(400, 'Must have link');
+        return;
+      }
+
       window.plugins.spinnerDialog.show('Add new link', 'Please wait', true);
       try {
         let response = await addLink(this.newLink, false);
@@ -389,7 +394,7 @@ export default {
           table: mode[0].toUpperCase() + mode.slice(1),
           changes: this.linkChanges,
           link: this.linkData.link
-        });
+        }, this.linkData);
         this.triggerAlert(response.status, response.data);
 
         // Clear old changes
@@ -423,7 +428,7 @@ export default {
         let response = await adjustLink({
           promote: this.deleteMode == 'promote',
           id: this.linkData.id,
-        });
+        }, this.linkData);
         this.triggerAlert(response.status, response.data);
 
         // Delete source data in table
@@ -451,7 +456,7 @@ export default {
           table: mode[0].toUpperCase() + mode.slice(1),
           id: this.linkData.id,
           link: this.linkData.link,
-        });
+        }, this.linkData);
         this.triggerAlert(response.status, response.data);
 
         // Delete source data in table

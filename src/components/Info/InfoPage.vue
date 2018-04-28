@@ -123,6 +123,7 @@ export default {
       }
 
       this.triggerAlert(200, 'Data imported');
+      //setTimeout(this.$parent.adjustAppProgressBar(), 500);
     },
 
     // Trigger alert

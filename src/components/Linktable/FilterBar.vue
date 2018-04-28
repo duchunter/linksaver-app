@@ -78,8 +78,8 @@
     </div>
 
     <!-- Modals -->
-    <date-modal :title="pickerTitle"/>
-    <rating-modal/>
+    <date-modal :title="pickerTitle" :picker="picker"/>
+    <rating-modal :picker="picker"/>
   </div>
 </template>
 
@@ -109,7 +109,8 @@ export default {
       });
 
       Object.keys(this.picker).forEach(key => {
-        delete this.picker[key];
+        this.picker[key].from = null;
+        this.picker[key].to = null;
       });
     },
 

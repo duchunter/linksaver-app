@@ -1,9 +1,10 @@
 <template>
   <tbody>
-    <tr v-for="link in links"
+    <tr v-for="(link, index) in links"
         @click="showInfo(link)"
         data-toggle="modal"
         data-target="#link-info-modal">
+      <td>{{index + 1}}</td>
       <td v-for="item in Object.keys(displayOption)"
           v-if="displayOption[item]">
         {{

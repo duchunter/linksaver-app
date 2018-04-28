@@ -33,6 +33,20 @@
       <span class="caret"></span>
     </button>
 
+    <!-- Random for main-->
+    <button @click="getRandomLink"
+            class="btn btn-info"
+            v-if="mode == 'main' && main.length != 0">
+       Random
+    </button>
+
+    <!-- Random for temp-->
+    <button @click="getRandomLink"
+            class="btn btn-info"
+            v-if="mode == 'temp' && temp.length != 0">
+       Random
+    </button>
+
     <!-- Displaying progress bar-->
     <div class="btn btn-default" @click="clearFilter">
       <div class="progress">
@@ -51,7 +65,7 @@
       </div>
     </div>
 
-    <sort-options :table="mainLinks"/>
+    <sort-options :table="mode == 'main' ? mainLinks : tempLinks"/>
     <filter-bar :condition="condition" :picker="picker"/>
   </div>
 </template>
@@ -76,9 +90,19 @@ export default {
       });
 
       Object.keys(this.picker).forEach(key => {
-        delete this.picker[key];
+        this.picker[key].from = null;
+        this.picker[key].to = null;
       });
     },
+
+    // Get random link
+    getRandomLink() {
+      let randomLink = this.mode == 'main'
+        ? this.main[Math.floor((Math.random() * this.main.length))]
+        : this.temp[Math.floor((Math.random() * this.temp.length))];
+      this.$parent.displayInfo(randomLink);
+      $('#link-info-modal').modal('show');
+    }
   }
 }
 </script>

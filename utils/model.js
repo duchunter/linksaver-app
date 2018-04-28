@@ -62,6 +62,7 @@ function readFile(filename, outputObj) {
                 if (filename == 'temp.json') {
                   outputObj.tempLinks = pack;
                 }
+                outputObj.adjustAppProgressBar();
               } catch (e) {
                 alert(e);
               }

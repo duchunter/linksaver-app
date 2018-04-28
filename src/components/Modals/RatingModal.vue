@@ -20,7 +20,9 @@
             <div class="form-group">
               <label class="control-label col-sm-3">From:</label>
               <div class="col-sm-7">
-                <input type="input" class="form-control" v-model="from">
+                <input type="input"
+                       class="form-control"
+                       v-model="picker.rating.from">
               </div>
             </div>
           </div>
@@ -30,7 +32,9 @@
             <div class="form-group">
               <label class="control-label col-sm-3">To:</label>
               <div class="col-sm-7">
-                <input type="input" class="form-control" v-model="to">
+                <input type="input"
+                       class="form-control"
+                       v-model="picker.rating.to">
               </div>
             </div>
           </div>
@@ -51,47 +55,16 @@
 <script>
 export default {
   name: 'RatingModal',
-  props: [],
-  data() {
-    return {
-      from: '',
-      to: ''
-    }
-  },
-
-  mounted() {
-    $('#rating-modal').on("hidden.bs.modal", () => {
-      this.submit();
-    });
-  },
-
+  props: ['picker'],
   methods: {
     reset() {
-      this.from = '';
-      this.to = '';
-    },
-
-    submit() {
-      this.$parent.picker.rating = {
-        logic: '&&',
-        value: [
-          {
-            logic: '>=',
-            value: this.from ? this.from : 0
-          },
-          {
-            logic: '<=',
-            value: this.to ? this.to : 5
-          }
-        ]
-      }
+      this.picker.from = null;
+      this.picker.to = null;
     }
   }
 }
 </script>
 
 <style scoped>
-
-
 
 </style>

@@ -23,6 +23,7 @@
           <!-- Headers -->
           <thead>
             <tr>
+              <th>#</th>
               <th v-for="item in Object.keys(displayOption)"
                   v-if="displayOption[item]">
                 {{item[0].toUpperCase() + item.slice(1)}}
@@ -86,7 +87,11 @@ export default {
 
       splitData: ['tags', 'report', 'relation', 'lib'],
       pickerTitle: 'Added',
-      picker: {},
+      picker: {
+        added: {},
+        lastedit: {},
+        rating: {},
+      },
     };
   },
 
@@ -194,21 +199,27 @@ export default {
         }
       });
 
-      // Check picker data
-      if (this.picker.rating) {
-        ok &= link.rating >= this.picker.rating.value[0].value;
-        ok &= link.rating <= this.picker.rating.value[1].value;
+      // Check rating
+      if (this.picker.rating.from || this.picker.rating.to) {
+        ok &= link.rating >= this.picker.rating.from || 0;
+        ok &= link.rating <= this.picker.rating.to || 5;
       }
 
-      if (this.picker.added) {
-        ok &= link.added >= this.picker.added.value[0].value;
-        ok &= link.added <= this.picker.added.value[1].value;
-      }
+      // Check time (added, lastedit)
+      // Adjust this based on your timezone, mine is 7
+      const zone = 7 * 60 * 60 * 1000;
+      const day = 24 * 60 * 60 * 1000;
+      ['added', 'lastedit'].forEach(item => {
+        let from = this.picker[item].from;
+        let to = this.picker[item].to;
 
-      if (this.picker.lastedit) {
-        ok &= link.lastedit >= this.picker.lastedit.value[0].value;
-        ok &= link.lastedit <= this.picker.lastedit.value[1].value;
-      }
+        if (from || to) {
+          ok &= link[item] >= from ? new Date(from).getTime() - zone : 0;
+          ok &= link[item] <= to
+            ? new Date(to).getTime() - zone + day
+            : new Date().getTime()
+        }
+      });
 
       return ok;
     },
