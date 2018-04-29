@@ -49,6 +49,7 @@
 <script>
 import TableRows from './TableRows';
 import HeaderButtons from './HeaderButtons';
+import { writeFile } from '../../../utils/model';
 
 export default {
   name: 'LinksTable',
@@ -128,6 +129,17 @@ export default {
           }
         });
       }
+
+      // Write to file
+      try {
+        if (this.mode == 'main') {
+          writeFile('main.json', JSON.stringify(this.$parent.mainLinks));
+        } else {
+          writeFile('temp.json', JSON.stringify(this.$parent.tempLinks));
+        }
+      } catch (e) {
+        alert(e);
+      }
     },
 
     changeId(newId, oldId) {
@@ -139,6 +151,13 @@ export default {
       Object.keys(this.$parent.linkChanges).forEach(key => {
         target[key] = this.$parent.linkChanges[key];
       });
+
+      // Write to file
+      try {
+        writeFile(`${this.mode}.json`, JSON.stringify(this.$parent.tempLinks));
+      } catch (e) {
+        alert(e);
+      }
     },
   },
 
@@ -200,10 +219,10 @@ export default {
       });
 
       // Check rating
-      if (this.picker.rating.from || this.picker.rating.to) {
-        ok &= link.rating >= this.picker.rating.from || 0;
-        ok &= link.rating <= this.picker.rating.to || 5;
-      }
+      let from = this.picker.rating.from || 0;
+      let to = this.picker.rating.to || 5;
+      ok &= link.rating >= parseInt(from);
+      ok &= link.rating <= parseInt(to);
 
       // Check time (added, lastedit)
       // Adjust this based on your timezone, mine is 7
@@ -213,11 +232,14 @@ export default {
         let from = this.picker[item].from;
         let to = this.picker[item].to;
 
+        let start = from ? new Date(from).getTime() - zone : 0;
+        let stop = to
+          ? new Date(to).getTime() - zone + day
+          : new Date().getTime();
+
         if (from || to) {
-          ok &= link[item] >= from ? new Date(from).getTime() - zone : 0;
-          ok &= link[item] <= to
-            ? new Date(to).getTime() - zone + day
-            : new Date().getTime()
+          ok &= link[item] >= start;
+          ok &= link[item] <= stop;
         }
       });
 

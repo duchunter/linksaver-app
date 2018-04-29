@@ -163,14 +163,14 @@
                   class="btn btn-primary">
             Submit changes
           </button>
-          <button v-if="infoMode == 'info' && linkData.origin == 'none'"
+          <button v-if="infoMode == 'info' && $parent.mode == 'main'"
                   @click="setDeleteMode('demote')"
                   data-toggle="collapse"
                   data-target="#are-you-sure"
                   class="btn btn-warning">
             Demote
           </button>
-          <button v-if="infoMode=='info' && linkData.origin != 'none'"
+          <button v-if="infoMode=='info' && $parent.mode == 'temp'"
                   @click="setDeleteMode('promote')"
                   data-toggle="collapse"
                   data-target="#are-you-sure"
@@ -209,8 +209,9 @@
 </template>
 
 <script>
+import { writeFile } from '../../../utils/model';
 import {
-  addLink, editLink, adjustLink, deleteLink, updateLink
+  addLink, editLink, adjustLink, deleteLink, updateLink, checkLink
 } from '../../../utils/api';
 
 export default {
@@ -364,6 +365,7 @@ export default {
 
     // Add link
     async addNewLink() {
+      // Must have link
       if (!this.newLink.link) {
         this.triggerAlert(400, 'Must have link');
         return;
@@ -371,9 +373,20 @@ export default {
 
       window.plugins.spinnerDialog.show('Add new link', 'Please wait', true);
       try {
+        // Success
         let response = await addLink(this.newLink, false);
         this.triggerAlert(response.status, response.data);
+
+        // Add to temp table and write to temp.json
+        let newLink = await checkLink(this.newLink.link, 'Temp');
+        if (newLink.err) {
+          alert(JSON.stringify(newLink.err));
+        } else {
+          this.$parent.tempLinks.push(newLink);
+          writeFile('temp.json', JSON.stringify(this.$parent.tempLinks));
+        }
       } catch (err) {
+        // Error handling
         if (!err.response) {
           this.triggerAlert(500, err);
         } else {
@@ -388,10 +401,12 @@ export default {
     async editlinkInfo() {
       window.plugins.spinnerDialog.show('Edit link', 'Please wait', true);
       let mode = this.$parent.mode;
+      let table = mode == 'main' ? 'Main' : 'Temp';
       try {
+        // Success
         let response = await editLink({
+          table,
           id: this.linkData.id,
-          table: mode[0].toUpperCase() + mode.slice(1),
           changes: this.linkChanges,
           link: this.linkData.link
         }, this.linkData);
@@ -402,15 +417,25 @@ export default {
           delete this.$parent.linkChanges[key];
         }
 
-        // Apply changes to current linkData and source data in table
+        // Get the new version with lastedit key
+        let newLink = await checkLink(null, table, this.linkData.id);
+        if (newLink.err) {
+          alert(JSON.stringify(newLink.err));
+        } else {
+          this.linkChanges.lastedit = newLink.lastedit;
+        }
+
+        // Apply changes to current linkData
         for (let key in this.linkChanges) {
           this.linkData[key] = this.linkChanges[key];
           this.$parent.linkChanges[key] = this.linkChanges[key];
         }
 
+        // Update source data in LinksTable, not here
         this.$parent.linkChanges.id = this.linkData.id;
         this.discardChanges();
       } catch (err) {
+        // Error handling
         if (!err.response) {
           this.triggerAlert(500, err);
         } else {
@@ -425,19 +450,36 @@ export default {
     async adjustLink() {
       window.plugins.spinnerDialog.show('Adjust link', 'Please wait', true);
       try {
+        // Success
+        let promote = this.deleteMode == 'promote';
         let response = await adjustLink({
-          promote: this.deleteMode == 'promote',
+          promote,
           id: this.linkData.id,
         }, this.linkData);
         this.triggerAlert(response.status, response.data);
 
+        // Add new link to source table and write to file
+        let table = promote ? 'Main' : 'Temp';
+        let newLink = await checkLink(this.linkData.link, table);
+        if (newLink.err) {
+          alert(JSON.stringify(newLink.err));
+        } else {
+          if (promote) {
+            this.$parent.mainLinks.push(newLink);
+            writeFile('main.json', JSON.stringify(this.$parent.mainLinks));
+          } else {
+            this.$parent.tempLinks.push(newLink);
+            writeFile('temp.json', JSON.stringify(this.$parent.tempLinks));
+          }
+        }
         // Delete source data in table
         this.$parent.deleteId = 0;
         this.$parent.deleteId = this.linkData.id;
 
         // Hide this modal
         $('#link-info-modal').modal('hide');
-      } catch (e) {
+      } catch (err) {
+        // Error handling
         if (!err.response) {
           this.triggerAlert(500, err);
         } else {
@@ -452,6 +494,7 @@ export default {
       window.plugins.spinnerDialog.show('Delete link', 'Please wait', true);
       let mode = this.$parent.mode;
       try {
+        // Success
         let response = deleteLink({
           table: mode[0].toUpperCase() + mode.slice(1),
           id: this.linkData.id,
@@ -465,7 +508,7 @@ export default {
 
         // Hide this modal
         $('#link-info-modal').modal('hide');
-      } catch (e) {
+      } catch (err) {
         if (!err.response) {
           this.triggerAlert(500, err);
         } else {

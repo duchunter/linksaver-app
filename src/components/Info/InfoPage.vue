@@ -18,7 +18,8 @@
     </div>
 
     <!-- Progress bar -->
-    <h4>App database</h4>
+    <hr>
+    <p>App database</p>
     <div class="progress">
       <div id="appMain"
            class="progress-bar progress-bar-success"
@@ -38,7 +39,7 @@
       </div>
     </div>
 
-    <h4>Server database</h4>
+    <p>Server database</p>
     <div class="progress">
       <div id="mainCount"
            class="progress-bar progress-bar-success"
@@ -58,7 +59,7 @@
       </div>
     </div>
 
-    <h4>Logs</h4>
+    <p>Logs</p>
     <div class="progress">
       <div id="logsCount"
            class="progress-bar progress-bar-danger"
@@ -74,7 +75,7 @@
     <br />
     <div class="panel panel-default">
       <div class="panel-heading">
-        <h3 class="panel-title">Action log</h3>
+        <p>Action log</p>
       </div>
       <div class="panel-body terminal-body">
         <p v-for="log in actionLogs"

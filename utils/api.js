@@ -5,7 +5,7 @@ const BASE_URL = 'https://gp-linksaver.herokuapp.com';
 
 export {
   getInfo, searchLink, addLink, editLink,
-  adjustLink, deleteLink, sendLog,
+  adjustLink, deleteLink, sendLog, checkLink
 };
 
 // Return the latest version of a link
