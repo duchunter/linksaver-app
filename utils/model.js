@@ -2,79 +2,68 @@
 
 export { readFile, writeFile };
 
-function handleError(err) {
-  if (err.code == 1) {
-    alert('Cannot open file: ' + JSON.stringify(err));
-  } else {
-    alert(err);
-    alert(JSON.stringify(err));
+function writeFile(filename, content) {
+  // Use this to handle all error callback
+  let handleError = function (err) {
+    reject(err.code == 1 ? `Cannot openfile: ${err}` : err);
   }
-}
-
-function writeFile(filename, content, msg = "Write file complete") {
-  window.resolveLocalFileSystemURL(
-    cordova.file.externalDataDirectory,
-    dir => {
-      dir.getFile(
-        filename,
-        { create: true },
-        fileEntry => {
+  // Access local file system and write file
+  // Use arrow function here cause no need to use 'this'
+  try {
+    window.resolveLocalFileSystemURL(
+      cordova.file.externalDataDirectory,
+      dir => {
+        dir.getFile(filename, { create: true }, fileEntry => {
           fileEntry.createWriter(fileWriter => {
             // Write complete callback
             fileWriter.onwriteend = e => {
-              alert(msg);
+              resolve(`Write to ${filename} complete`);
             }
-
             // Handle error callback
             fileWriter.onerror = handleError;
 
             // Write file
             let blob = new Blob([content], {type: 'text/plain'});
             fileWriter.write(blob);
+
+            // Put 3 error callback for 3 functions :v
           }, handleError);
-        },
-        handleError
-      );
-    },
-    handleError
-  );
+        }, handleError);
+      }, handleError);
+  } catch (err) {
+    handleError(err);
+  }
 }
 
-function readFile(filename, outputObj) {
-  window.resolveLocalFileSystemURL(
-    cordova.file.externalDataDirectory,
-    function (dir) {
-      dir.getFile(
-        filename,
-        {},
-        function (fileEntry) {
-          fileEntry.file(function (file) {
-            let reader = new FileReader();
-            // Read complete callback
-            reader.onloadend = function (e) {
-              try {
-                let pack = JSON.parse(this.result);
-                alert('Import: ' + pack.length);
-                if (filename == 'main.json') {
-                  outputObj.mainLinks = pack;
-                }
+function readFile(filename) {
+  return new Promise((resolve, reject) => {
+    // Use this to handle all error callback
+    let handleError = function (err) {
+      reject(err.code == 1 ? `Cannot openfile: ${err}` : err);
+    }
+    // Access local file system and read file
+    // Use 'function' instead of arrow function to avoid auto binding 'this'
+    try {
+      window.resolveLocalFileSystemURL(
+        cordova.file.externalDataDirectory,
+        function (dir) {
+          dir.getFile(filename, {}, function (fileEntry) {
+            fileEntry.file(function (file) {
+              let reader = new FileReader();
 
-                if (filename == 'temp.json') {
-                  outputObj.tempLinks = pack;
-                }
-                outputObj.adjustAppProgressBar();
-              } catch (e) {
-                alert(e);
+              // Read complete callback
+              reader.onloadend = function (e) {
+                resolve(JSON.parse(this.result));
               }
-            }
+              // Read file
+              reader.readAsText(file);
 
-            // Read file
-            reader.readAsText(file);
+              // Put 3 error callback for 3 functions :v
+            }, handleError);
           }, handleError);
-        },
-        handleError
-      );
-    },
-    handleError
-  );
+      }, handleError);
+    } catch (err) {
+      handleError(err);
+    }
+  });
 }

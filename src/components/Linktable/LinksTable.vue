@@ -131,15 +131,15 @@ export default {
       }
 
       // Write to file
-      try {
-        if (this.mode == 'main') {
-          writeFile('main.json', JSON.stringify(this.$parent.mainLinks));
-        } else {
-          writeFile('temp.json', JSON.stringify(this.$parent.tempLinks));
-        }
-      } catch (e) {
-        alert(e);
-      }
+      let data = JSON.stringify(
+        this.mode == 'main' ? this.$parent.mainLinks : this.$parent.tempLinks
+      )
+
+      writeFile(`${this.mode}.json`, data).then(result => {
+        this.$parent.showStatus('200', result);
+      }).catch(err => {
+        this.$parent.showStatus('500', err);
+      });
     },
 
     changeId(newId, oldId) {
@@ -153,11 +153,15 @@ export default {
       });
 
       // Write to file
-      try {
-        writeFile(`${this.mode}.json`, JSON.stringify(this.$parent.tempLinks));
-      } catch (e) {
-        alert(e);
-      }
+      let data = JSON.stringify(
+        this.mode == 'main' ? this.$parent.mainLinks : this.$parent.tempLinks
+      )
+
+      writeFile(`${this.mode}.json`, data).then(result => {
+        this.$parent.showStatus('200', result);
+      }).catch(err => {
+        this.$parent.showStatus('500', err);
+      });
     },
   },
 

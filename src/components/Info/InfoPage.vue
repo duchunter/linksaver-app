@@ -114,17 +114,19 @@ export default {
 
   methods: {
     // Import data
-    importData() {
+    async importData() {
+      window.plugins.spinnerDialog.show('Import data', 'Please wait', true);
+
       try {
-        readFile('main.json', this.$parent);
-        readFile('temp.json', this.$parent);
+        this.$parent.mainLinks = await readFile('main.json');
+        this.$parent.tempLinks = await readFile('temp.json');
       } catch (err) {
         this.triggerAlert(500, err);
         return;
       }
 
       this.triggerAlert(200, 'Data imported');
-      //setTimeout(this.$parent.adjustAppProgressBar(), 500);
+      window.plugins.spinnerDialog.hide();
     },
 
     // Trigger alert
