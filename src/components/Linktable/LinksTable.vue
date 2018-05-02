@@ -136,9 +136,9 @@ export default {
       )
 
       writeFile(`${this.mode}.json`, data).then(result => {
-        this.$parent.showStatus('200', result);
+        this.$parent.showStatus(200, result);
       }).catch(err => {
-        this.$parent.showStatus('500', err);
+        this.$parent.showStatus(500, err);
       });
     },
 
@@ -158,9 +158,9 @@ export default {
       )
 
       writeFile(`${this.mode}.json`, data).then(result => {
-        this.$parent.showStatus('200', result);
+        this.$parent.showStatus(200, result);
       }).catch(err => {
-        this.$parent.showStatus('500', err);
+        this.$parent.showStatus(500, err);
       });
     },
   },

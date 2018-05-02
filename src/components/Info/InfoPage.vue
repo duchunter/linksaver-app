@@ -120,12 +120,11 @@ export default {
       try {
         this.$parent.mainLinks = await readFile('main.json');
         this.$parent.tempLinks = await readFile('temp.json');
+        this.triggerAlert(200, 'Data imported');
       } catch (err) {
         this.triggerAlert(500, err);
-        return;
       }
 
-      this.triggerAlert(200, 'Data imported');
       window.plugins.spinnerDialog.hide();
     },
 

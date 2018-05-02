@@ -67,18 +67,36 @@ export default {
 
       window.plugins.spinnerDialog.show('Updating', 'Please wait', true);
       try {
+        // Get all link from server db
         let getMain = searchLink({ mode: 'all', table: 'Main' });
         let getTemp = searchLink({ mode: 'all', table: 'Temp' });
 
         let mainResponse = await getMain;
         let tempResponse = await getTemp;
 
+        // Add to current tables
         this.$parent.mainLinks = mainResponse.data.reverse();
         this.$parent.tempLinks = tempResponse.data.reverse();
 
-        writeFile('main.json', JSON.stringify(this.$parent.mainLinks));
-        writeFile('temp.json', JSON.stringify(this.$parent.tempLinks));
+        // Write to files
+        writeFile('main.json', JSON.stringify(this.$parent.mainLinks))
+          .then(result => {
+            this.$parent.showStatus(200, result);
+          })
+          .catch(err => {
+            this.$parent.showStatus(500, err);
+          });
+
+        writeFile('temp.json', JSON.stringify(this.$parent.tempLinks))
+          .then(result => {
+            this.$parent.showStatus(200, result);
+          })
+          .catch(err => {
+            this.$parent.showStatus(500, err);
+          });
+
       } catch (err) {
+        // Catch error (syntax or no internet)
         if (!err.response) {
           this.$parent.showStatus(500, err);
         } else {

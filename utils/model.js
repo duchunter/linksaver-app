@@ -3,36 +3,38 @@
 export { readFile, writeFile };
 
 function writeFile(filename, content) {
-  // Use this to handle all error callback
-  let handleError = function (err) {
-    reject(err.code == 1 ? `Cannot openfile: ${err}` : err);
-  }
-  // Access local file system and write file
-  // Use arrow function here cause no need to use 'this'
-  try {
-    window.resolveLocalFileSystemURL(
-      cordova.file.externalDataDirectory,
-      dir => {
-        dir.getFile(filename, { create: true }, fileEntry => {
-          fileEntry.createWriter(fileWriter => {
-            // Write complete callback
-            fileWriter.onwriteend = e => {
-              resolve(`Write to ${filename} complete`);
-            }
-            // Handle error callback
-            fileWriter.onerror = handleError;
+  return new Promise((resolve, reject) => {
+    // Use this to handle all error callback
+    let handleError = function (err) {
+      reject(err.code == 1 ? `Cannot openfile: ${err}` : err);
+    }
+    // Access local file system and write file
+    // Use arrow function here cause no need to use 'this'
+    try {
+      window.resolveLocalFileSystemURL(
+        cordova.file.externalDataDirectory,
+        dir => {
+          dir.getFile(filename, { create: true }, fileEntry => {
+            fileEntry.createWriter(fileWriter => {
+              // Write complete callback
+              fileWriter.onwriteend = e => {
+                resolve(`Write to ${filename} complete`);
+              }
+              // Handle error callback
+              fileWriter.onerror = handleError;
 
-            // Write file
-            let blob = new Blob([content], {type: 'text/plain'});
-            fileWriter.write(blob);
+              // Write file
+              let blob = new Blob([content], {type: 'text/plain'});
+              fileWriter.write(blob);
 
-            // Put 3 error callback for 3 functions :v
+              // Put 3 error callback for 3 functions :v
+            }, handleError);
           }, handleError);
         }, handleError);
-      }, handleError);
-  } catch (err) {
-    handleError(err);
-  }
+    } catch (err) {
+      handleError(err);
+    }
+  });
 }
 
 function readFile(filename) {
