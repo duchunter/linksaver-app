@@ -211,7 +211,7 @@
 <script>
 import { writeFile } from '../../../utils/model';
 import {
-  addLink, editLink, adjustLink, deleteLink, updateLink, checkLink
+  addLink, editLink, adjustLink, deleteLink, checkLink
 } from '../../../utils/api';
 
 export default {
@@ -495,7 +495,7 @@ export default {
       let mode = this.$parent.mode;
       try {
         // Success
-        let response = deleteLink({
+        let response = await deleteLink({
           table: mode[0].toUpperCase() + mode.slice(1),
           id: this.linkData.id,
           link: this.linkData.link,

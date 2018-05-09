@@ -110,6 +110,7 @@ export default {
 
   mounted() {
     this.$parent.adjustAppProgressBar();
+    setTimeout(this.importData, 500);
   },
 
   methods: {
@@ -126,6 +127,7 @@ export default {
       }
 
       window.plugins.spinnerDialog.hide();
+      this.$parent.adjustAppProgressBar();
     },
 
     // Trigger alert
