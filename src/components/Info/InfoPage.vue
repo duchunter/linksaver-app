@@ -110,7 +110,7 @@ export default {
 
   mounted() {
     this.$parent.adjustAppProgressBar();
-    setTimeout(this.importData, 500);
+    setTimeout(this.importData, 1000);
   },
 
   methods: {
