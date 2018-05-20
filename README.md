@@ -1,6 +1,11 @@
 # link-saver-app
 
-> A Vue.js project
+> Hybrid Vue + Cordova mobile app version of [linksaver-client](https://github.com/duchunter/link-saver-client) to save all links offline
+
+Info          |  Links
+:-------------------------:|:-------------------------:
+![](https://image.ibb.co/cmFVBT/32960572_1003926659782147_825428586134503424_n.png)  |  ![](https://image.ibb.co/fjVxrT/32967053_1003926669782146_4389532348325036032_n.png)
+
 
 ## Build Setup
 
@@ -8,23 +13,24 @@
 # install dependencies
 npm install
 
-# serve with hot reload at localhost:8080
-npm run dev
-
 # build for production with minification
 npm run build
 
-# build for production and view the bundle analyzer report
-npm run build --report
+# check requirements for specific platform
+cordova requirements
 
-# run unit tests
-npm run unit
+# run app on browser
+npm run web
 
-# run e2e tests
-npm run e2e
+# run app on Android emulator
+npm run android
 
-# run all tests
-npm test
+# build .apk file for android
+cordova build android
 ```
 
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+>You can also add ios platform by runnning ```cordova platforms add ios``` and fullfill ```cordova requirements```
+
+> If you want to use your own Auth0 client, please edit ```env.js```
+
+>If you want to use your own Linksaver server, edit ```BASE_URL``` in ```utils/api.js```
